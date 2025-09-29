@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Bomb Map</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#0f141a; --muted:#8aa0b3; --text:#e8f1ff;
+    --green:#24d88a; --red:#ff5d5d; --blue:#2a92ff; --outline:#1c2733;
+    --radius:14px; --shadow:0 12px 34px rgba(0,0,0,.45);
+  }
+  body{ margin:0; min-height:100svh; background:linear-gradient(180deg,#0b0f14,#070a0e); color:var(--text);
+        font:400 16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .wrap{ max-width:1100px; margin:clamp(10px,4svh,36px) auto; padding:0 16px; }
+  header{ display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:12px; }
+  h1{ margin:0; font-weight:800; text-shadow:0 0 18px rgba(42,146,255,.25); }
+  .controls{ display:flex; gap:8px; flex-wrap:wrap; }
+  select,input{ height:40px; padding:0 12px; border-radius:10px; border:1px solid var(--outline); background:#121922; color:var(--text); }
+  .panel{ background:linear-gradient(180deg,rgba(255,255,255,.03),transparent), var(--panel); border:1px solid var(--outline); border-radius:var(--radius); box-shadow:var(--shadow); }
+  .legend{ display:flex; gap:12px; align-items:center; color:var(--muted); font-size:14px; }
+  .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
+  .dot.green{ background:var(--green); } .dot.red{ background:var(--red); }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; padding:12px; }
+  .tile{ border:1px solid var(--outline); border-radius:12px; padding:10px; background:#0e151d; transition:transform .06s ease, border-color .15s ease; cursor:default; }
+  .tile:hover{ transform:none; border-color:var(--outline); }
+  .tile .id{ font-weight:800; }
+  .tile .zone{ color:var(--muted); font-size:12px; }
+  .badge{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid; }
+  .badge.active{ color:#ffb0b0; border-color:#ff9393; background:rgba(255,93,93,.10); }
+  .badge.defused{ color:#a9f3d2; border-color:#50e2a8; background:rgba(36,216,138,.10); }
+  .floor{ position:relative; overflow:hidden; }
+  .floor img{ width:100%; display:block; opacity:.95; }
+  .pin{ position:absolute; transform:translate(-50%,-50%); min-width:46px; max-width:30vw;
+        background:#0e151d; border:1px solid var(--outline); border-radius:12px; padding:8px 10px; cursor:default; text-align:center; }
+  .pin .id{ font-weight:800; }
+  .pin .badge{ margin-top:4px; display:inline-block; }
+  .status{ margin-top:10px; color:var(--muted); font-size:13px; }
+  a.btn{ display:inline-block; height:40px; line-height:40px; padding:0 12px; border-radius:10px; background:#1b2430; color:#bcd4f0; text-decoration:none; border:1px solid var(--outline); }
+  a.btn:hover{ background:#1f2b39; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Bomb Map</h1>
+    <div class="controls">
+      <select id="zoneSel"><option value="">All zones</option></select>
+      <select id="statusSel">
+        <option value="">All status</option>
+        <option value="Active">Active</option>
+        <option value="Defused">Defused</option>
+      </select>
+      <input id="searchBox" placeholder="Search ID or name…" />
+      <a id="refreshBtn" class="btn" href="#">Refresh</a>
+    </div>
+  </header>
+
+  <div id="legend" class="legend" style="margin:8px 0 10px 2px;">
+    <span><span class="dot red"></span>Active</span>
+    <span><span class="dot green"></span>Defused</span>
+  </div>
+
+  <div id="container" class="panel"></div>
+  <div id="status" class="status"></div>
+</div>
+
+<script>
+/* ======= CONFIG ======= */
+const API_BASE   = 'https://script.google.com/macros/s/AKfycbwM4wSCU0k-aLKu2_sl0M9CM_rZ7i-3Hdek-4taLAuS0OVt7gxUeoHl_Qz50cJy748V/exec';  // Apps Script /exec
+const FLOORPLAN_URL = ''; // optional image URL
+const AUTO_REFRESH_MS = 5000;
+/* ====================== */
+
+// JSONP helper
+function jsonp(path, params){
+  return new Promise((resolve,reject)=>{
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    const url = API_BASE + '?' + new URLSearchParams({ ...params, action:path, callback:cb });
+    const s = document.createElement('script');
+    window[cb] = (data)=>{ resolve(data); cleanup(); };
+    s.onerror = ()=>{ reject(new Error('JSONP load error')); cleanup(); };
+    function cleanup(){ try{ delete window[cb]; }catch(_){} s.remove(); }
+    s.src = url; document.body.appendChild(s);
+  });
+}
+
+const el = {
+  container: document.getElementById('container'),
+  zoneSel: document.getElementById('zoneSel'),
+  statusSel: document.getElementById('statusSel'),
+  search: document.getElementById('searchBox'),
+  status: document.getElementById('status'),
+  refresh: document.getElementById('refreshBtn')
+};
+
+let data = { items:[] };
+
+function badge(status){
+  const cls = (status==='Defused') ? 'defused' : 'active';
+  return `<span class="badge ${cls}">${status}</span>`;
+}
+function tileHTML(b){
+  return `<div class="tile">
+    <div class="id">${b.id}</div>
+    <div class="zone">${b.name || ''}${b.zone ? ' • '+b.zone : ''}</div>
+    <div style="margin-top:6px">${badge(b.locked?'Defused':b.status||'Active')}${b.group? ' — Group '+b.group : ''}</div>
+  </div>`;
+}
+function pinHTML(b){
+  const left = (b.x!=null)? b.x : 50, top = (b.y!=null)? b.y : 50;
+  return `<div class="pin" style="left:${left}%; top:${top}%;">
+    <div class="id">${b.id}</div>
+    <div class="zone" style="color:#8aa0b3;font-size:12px;">${b.zone || ''}</div>
+    <div>${badge(b.locked?'Defused':b.status||'Active')}</div>
+  </div>`;
+}
+
+function uniqueZones(items){
+  const z = Array.from(new Set(items.map(i => (i.zone||'').toString().trim()).filter(Boolean))).sort();
+  el.zoneSel.innerHTML = '<option value="">All zones</option>' + z.map(v=>`<option>${v}</option>`).join('');
+}
+
+function applyFilters(items){
+  const z = el.zoneSel.value.trim();
+  const s = el.statusSel.value.trim();
+  const q = el.search.value.trim().toLowerCase();
+  return items.filter(b=>{
+    if (z && String(b.zone||'') !== z) return false;
+    const st = b.locked ? 'Defused' : (b.status || 'Active');
+    if (s && st !== s) return false;
+    if (q && !(String(b.id||'').toLowerCase().includes(q) || String(b.name||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function render(){
+  const items = applyFilters(data.items);
+  const counts = {
+    total: data.items.length,
+    active: data.items.filter(b=>!(b.locked) && (b.status!=='Defused')).length,
+    defused: data.items.filter(b=> b.locked || b.status==='Defused').length
+  };
+  el.status.textContent = `Showing ${items.length}/${counts.total} • Active ${counts.active} • Defused ${counts.defused}`;
+
+  if (FLOORPLAN_URL){
+    el.container.className = 'panel floor';
+    el.container.innerHTML = `<img src="${https://raw.githubusercontent.com/chaninatw/defuse/63530b9441f06c5f73dbb2a57951b9a0bd14bdc0/KVIS_map.png
+}" alt="Floorplan"/>` + items.map(pinHTML).join('');
+  } else {
+    el.container.className = 'panel grid';
+    el.container.innerHTML = items.map(tileHTML).join('');
+  }
+}
+
+async function load(){
+  try{
+    const res = await jsonp('list', {});
+    if (!res || !res.ok) throw new Error(res && res.message || 'Load error');
+    data = res;
+    uniqueZones(res.items);
+    render();
+  }catch(e){
+    el.status.textContent = '⚠️ ' + e.message;
+  }
+}
+
+el.zoneSel.onchange = render;
+el.statusSel.onchange = render;
+el.search.oninput = ()=>{ render(); };
+el.refresh.onclick = (e)=>{ e.preventDefault(); load(); };
+
+load();
+setInterval(load, AUTO_REFRESH_MS);
+</script>
+</body>
+</html>
