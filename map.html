@@ -18,23 +18,55 @@
   .controls{ display:flex; gap:8px; flex-wrap:wrap; }
   select,input{ height:40px; padding:0 12px; border-radius:10px; border:1px solid var(--outline); background:#121922; color:var(--text); }
   .panel{ background:linear-gradient(180deg,rgba(255,255,255,.03),transparent), var(--panel); border:1px solid var(--outline); border-radius:var(--radius); box-shadow:var(--shadow); }
+
   .legend{ display:flex; gap:12px; align-items:center; color:var(--muted); font-size:14px; }
   .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
   .dot.green{ background:var(--green); } .dot.red{ background:var(--red); }
+
+  /* GRID fallback (when no floorplan) */
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; padding:12px; }
-  .tile{ border:1px solid var(--outline); border-radius:12px; padding:10px; background:#0e151d; transition:transform .06s ease, border-color .15s ease; cursor:default; }
-  .tile:hover{ transform:none; border-color:var(--outline); }
+  .tile{ border:1px solid var(--outline); border-radius:12px; padding:10px; background:#0e151d; }
   .tile .id{ font-weight:800; }
   .tile .zone{ color:var(--muted); font-size:12px; }
   .badge{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid; }
   .badge.active{ color:#ffb0b0; border-color:#ff9393; background:rgba(255,93,93,.10); }
   .badge.defused{ color:#a9f3d2; border-color:#50e2a8; background:rgba(36,216,138,.10); }
-  .floor{ position:relative; overflow:hidden; }
-  .floor img{ width:100%; display:block; opacity:.95; }
-  .pin{ position:absolute; transform:translate(-50%,-50%); min-width:46px; max-width:30vw;
-        background:#0e151d; border:1px solid var(--outline); border-radius:12px; padding:8px 10px; cursor:default; text-align:center; }
+
+  /* FLOORPLAN (fixed container + separate overlay) */
+  .map-shell{ padding:0; }
+  .map-container{
+    position:relative;
+    width:100%;
+    max-width:1200px;
+    margin:12px auto 0;
+    overflow:hidden;
+    border-radius:12px;
+  }
+  .map-container img{
+    width:100%;
+    height:auto;            /* ✅ prevents distortion */
+    display:block;
+  }
+  #pinsLayer{
+    position:absolute;
+    inset:0;                /* top/right/bottom/left = 0 */
+    pointer-events:none;    /* pins are display-only here */
+  }
+  .pin{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    min-width:46px;
+    background:#0e151d;
+    border:1px solid var(--outline);
+    border-radius:12px;
+    padding:6px 8px;
+    text-align:center;
+  }
   .pin .id{ font-weight:800; }
   .pin .badge{ margin-top:4px; display:inline-block; }
+  .pin.defX::after{ content:"✕"; position:absolute; inset:-4px; display:grid; place-items:center; font-size:34px; color:rgba(255,93,93,.9); text-shadow:0 0 10px rgba(255,93,93,.45); }
+  .pin.faded{ opacity:.35; filter:grayscale(.25); }
+
   .status{ margin-top:10px; color:var(--muted); font-size:13px; }
   a.btn{ display:inline-block; height:40px; line-height:40px; padding:0 12px; border-radius:10px; background:#1b2430; color:#bcd4f0; text-decoration:none; border:1px solid var(--outline); }
   a.btn:hover{ background:#1f2b39; }
@@ -61,89 +93,51 @@
     <span><span class="dot green"></span>Defused</span>
   </div>
 
-<!-- MAP: responsive floorplan + absolute pins -->
-<div id="container" class="panel" style="padding:0;">
-  <div class="map-container">
-    <img id="floorImage" src="KVIS_map.png" alt="Floorplan">
-    <div id="pinsLayer"></div>
+  <!-- ✅ Stable floorplan container -->
+  <div id="container" class="panel map-shell">
+    <div class="map-container">
+      <img id="floorImage" src="KVIS_map.png" alt="Floorplan">
+      <div id="pinsLayer"></div>
+    </div>
   </div>
+
+  <div id="status" class="status"></div>
 </div>
-
-<div id="status" class="status"></div>
-</div>
-<style>
-  body {
-    background-color: #0a0f16;
-    color: #e0e6ed;
-    font-family: 'Segoe UI', sans-serif;
-    text-align: center;
-  }
-
-  .map-container {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    margin: 2rem auto;
-    overflow: hidden;
-    border-radius: 12px;
-  }
-
-  .map-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  .bomb-marker {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    border-radius: 50%;
-    text-align: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 4px 6px;
-    user-select: none;
-  }
-
-  /* Optional: Hover glow */
-  .bomb-marker:hover {
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-    transform: translate(-50%, -50%) scale(1.2);
-    z-index: 10;
-  }
-</style>
-
-  
 
 <script>
 /* ======= CONFIG ======= */
-const API_BASE   = 'https://script.google.com/macros/s/AKfycbyIMQhvL2-3aXGVBlF6Br-7KgErcnQZus1eO07KdpbP48ainM5S3Z4dPSY-iVkYCW_o/exec';  // Apps Script /exec
-const FLOORPLAN_URL = 'https://raw.githubusercontent.com/chaninatw/defuse/<YOUR_COMMIT_ID>/KVIS_map.png'; // optional image URL
+const API_BASE       = 'https://script.google.com/macros/s/AKfycbyIMQhvL2-3aXGVBlF6Br-7KgErcnQZus1eO07KdpbP48ainM5S3Z4dPSY-iVkYCW_o/exec';
+const FLOORPLAN_URL  = 'KVIS_map.png';   // file in this repo; change to a full raw URL if you prefer
 const AUTO_REFRESH_MS = 5000;
 /* ====================== */
 
-// JSONP helper
-function jsonp(path, params){
-  return new Promise((resolve,reject)=>{
+/* Robust JSONP helper */
+function jsonp(action, params = {}) {
+  return new Promise((resolve, reject) => {
     const cb = 'cb_' + Math.random().toString(36).slice(2);
-    const url = API_BASE + '?' + new URLSearchParams({ ...params, action:path, callback:cb });
+    const qs = new URLSearchParams({ ...params, action, callback: cb }).toString();
+    const url = API_BASE + (API_BASE.includes('?') ? '&' : '?') + qs;
+
     const s = document.createElement('script');
-    window[cb] = (data)=>{ resolve(data); cleanup(); };
-    s.onerror = ()=>{ reject(new Error('JSONP load error')); cleanup(); };
+    s.src = url; s.async = true;
+
+    window[cb] = (data) => { cleanup(); resolve(data); };
+    s.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
+
     function cleanup(){ try{ delete window[cb]; }catch(_){} s.remove(); }
-    s.src = url; document.body.appendChild(s);
+    document.head.appendChild(s);
   });
 }
 
 const el = {
-  container: document.getElementById('container'),
-  zoneSel: document.getElementById('zoneSel'),
-  statusSel: document.getElementById('statusSel'),
-  search: document.getElementById('searchBox'),
-  status: document.getElementById('status'),
-  refresh: document.getElementById('refreshBtn')
+  container:  document.getElementById('container'),
+  pins:       document.getElementById('pinsLayer'),
+  floorImg:   document.getElementById('floorImage'),
+  zoneSel:    document.getElementById('zoneSel'),
+  statusSel:  document.getElementById('statusSel'),
+  search:     document.getElementById('searchBox'),
+  status:     document.getElementById('status'),
+  refresh:    document.getElementById('refreshBtn')
 };
 
 let data = { items:[] };
@@ -161,10 +155,12 @@ function tileHTML(b){
 }
 function pinHTML(b){
   const left = (b.x!=null)? b.x : 50, top = (b.y!=null)? b.y : 50;
-  return `<div class="pin" style="left:${left}%; top:${top}%;">
+  const defused = b.locked || (b.status === 'Defused');
+  const extra = defused ? ' defX faded' : '';
+  return `<div class="pin${extra}" style="left:${left}%; top:${top}%;">
     <div class="id">${b.id}</div>
     <div class="zone" style="color:#8aa0b3;font-size:12px;">${b.zone || ''}</div>
-    <div>${badge(b.locked?'Defused':b.status||'Active')}</div>
+    <div>${badge(defused?'Defused':(b.status||'Active'))}</div>
   </div>`;
 }
 
@@ -179,7 +175,7 @@ function applyFilters(items){
   const q = el.search.value.trim().toLowerCase();
   return items.filter(b=>{
     if (z && String(b.zone||'') !== z) return false;
-    const st = b.locked ? 'Defused' : (b.status || 'Active');
+    const st = (b.locked || b.status==='Defused') ? 'Defused' : (b.status || 'Active');
     if (s && st !== s) return false;
     if (q && !(String(b.id||'').toLowerCase().includes(q) || String(b.name||'').toLowerCase().includes(q))) return false;
     return true;
@@ -196,8 +192,9 @@ function render(){
   el.status.textContent = `Showing ${items.length}/${counts.total} • Active ${counts.active} • Defused ${counts.defused}`;
 
   if (FLOORPLAN_URL){
-    el.container.className = 'panel floor';
-    el.container.innerHTML = `<img src="${FLOORPLAN_URL}" alt="Floorplan"/>` + items.map(pinHTML).join('');
+    // ✅ keep the image element; only update src and pin overlay
+    if (el.floorImg && FLOORPLAN_URL) el.floorImg.src = FLOORPLAN_URL;
+    if (el.pins) el.pins.innerHTML = items.map(pinHTML).join('');
   } else {
     el.container.className = 'panel grid';
     el.container.innerHTML = items.map(tileHTML).join('');
@@ -216,9 +213,11 @@ async function load(){
   }
 }
 
-el.zoneSel.onchange = render;
-el.statusSel.onchange = render;
-el.search.oninput = ()=>{ render(); };
+['change','input'].forEach(ev=>{
+  el.zoneSel.addEventListener(ev, render);
+  el.statusSel.addEventListener(ev, render);
+  el.search.addEventListener(ev, render);
+});
 el.refresh.onclick = (e)=>{ e.preventDefault(); load(); };
 
 load();
@@ -226,10 +225,3 @@ setInterval(load, AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
