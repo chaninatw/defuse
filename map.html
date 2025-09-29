@@ -64,6 +64,49 @@
   <div id="container" class="panel"></div>
   <div id="status" class="status"></div>
 </div>
+<style>
+  body {
+    background-color: #0a0f16;
+    color: #e0e6ed;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+  }
+
+  .map-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .map-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .bomb-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    user-select: none;
+  }
+
+  /* Optional: Hover glow */
+  .bomb-marker:hover {
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    transform: translate(-50%, -50%) scale(1.2);
+    z-index: 10;
+  }
+</style>
 
 <script>
 /* ======= CONFIG ======= */
@@ -174,6 +217,7 @@ setInterval(load, AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
+
 
 
 
