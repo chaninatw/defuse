@@ -68,7 +68,7 @@
 <script>
 /* ======= CONFIG ======= */
 const API_BASE   = 'https://script.google.com/macros/s/AKfycbwM4wSCU0k-aLKu2_sl0M9CM_rZ7i-3Hdek-4taLAuS0OVt7gxUeoHl_Qz50cJy748V/exec';  // Apps Script /exec
-const FLOORPLAN_URL = ''; // optional image URL
+const FLOORPLAN_URL = 'https://raw.githubusercontent.com/chaninatw/defuse/<YOUR_COMMIT_ID>/KVIS_map.png'; // optional image URL
 const AUTO_REFRESH_MS = 5000;
 /* ====================== */
 
@@ -145,8 +145,7 @@ function render(){
 
   if (FLOORPLAN_URL){
     el.container.className = 'panel floor';
-    el.container.innerHTML = `<img src="${https://raw.githubusercontent.com/chaninatw/defuse/63530b9441f06c5f73dbb2a57951b9a0bd14bdc0/KVIS_map.png
-}" alt="Floorplan"/>` + items.map(pinHTML).join('');
+    el.container.innerHTML = `<img src="${FLOORPLAN_URL}" alt="Floorplan"/>` + items.map(pinHTML).join('');
   } else {
     el.container.className = 'panel grid';
     el.container.innerHTML = items.map(tileHTML).join('');
@@ -175,3 +174,4 @@ setInterval(load, AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
+
