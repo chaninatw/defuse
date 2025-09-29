@@ -61,8 +61,15 @@
     <span><span class="dot green"></span>Defused</span>
   </div>
 
-  <div id="container" class="panel"></div>
-  <div id="status" class="status"></div>
+<!-- MAP: responsive floorplan + absolute pins -->
+<div id="container" class="panel" style="padding:0;">
+  <div class="map-container">
+    <img id="floorImage" src="KVIS_map.png" alt="Floorplan">
+    <div id="pinsLayer"></div>
+  </div>
+</div>
+
+<div id="status" class="status"></div>
 </div>
 <style>
   body {
@@ -107,6 +114,8 @@
     z-index: 10;
   }
 </style>
+
+  
 
 <script>
 /* ======= CONFIG ======= */
@@ -217,6 +226,7 @@ setInterval(load, AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
+
 
 
 
