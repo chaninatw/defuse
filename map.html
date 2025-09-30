@@ -120,6 +120,27 @@
     border:1px solid var(--outline);
   }
   a.btn:hover{ background:#1f2b39; }
+  .badge {
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  border: 1px solid;
+  display: inline-block;
+}
+
+/* 🔴 Active bombs */
+.badge.active {
+  color: #ffb0b0;
+  border-color: #ff9393;
+  background: rgba(255, 93, 93, .10);
+}
+
+/* 🟢 Defused bombs */
+.badge.defused {
+  color: #a9f3d2;
+  border-color: #50e2a8;
+  background: rgba(36, 216, 138, .10);
+}
 </style>
 </head>
 <body>
@@ -329,3 +350,4 @@ setInterval(load, AUTO_REFRESH_MS);
 </script>
 </body>
 </html>
+
