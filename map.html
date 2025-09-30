@@ -32,15 +32,6 @@
   .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
   .dot.green{ background:var(--green); } .dot.red{ background:var(--red); }
 
-  /* Grid view fallback */
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; padding:12px; }
-  .tile{ border:1px solid var(--outline); border-radius:12px; padding:10px; background:#0e151d; }
-  .tile .id{ font-weight:800; }
-  .tile .zone{ color:var(--muted); font-size:12px; }
-  .badge{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid; }
-  .badge.active{ color:#ffb0b0; border-color:#ff9393; background:rgba(255,93,93,.10); }
-  .badge.defused{ color:#a9f3d2; border-color:#50e2a8; background:rgba(36,216,138,.10); }
-
   /* Floorplan layout */
   .map-shell{ padding:0; }
   .map-container{
@@ -51,16 +42,8 @@
     overflow:hidden;
     border-radius:12px;
   }
-  .map-container img{
-    width:100%;
-    height:auto;
-    display:block;
-  }
-  #pinsLayer{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
+  .map-container img{ width:100%; height:auto; display:block; }
+  #pinsLayer{ position:absolute; inset:0; pointer-events:none; }
 
   /* 📍 Pin Styling */
   .pin {
@@ -69,32 +52,27 @@
     min-width:46px;
     background:#0e151d;
     border:1px solid var(--outline);
-    border-radius:12px;
-    padding:4px 6px;
+    border-radius:10px;
+    padding:4px 5px;
     text-align:center;
-    font-size:13px;
+    font-size:12px;
   }
-  .pin .id { font-weight:800; font-size:13px; }
-  .pin .badge { margin-top:3px; display:inline-block; font-size:11px; }
-  .pin .zone { color:#8aa0b3; font-size:12px; }
+  .pin .id { font-weight:800; font-size:12px; line-height:1.1; }
+  .pin .zone { color:#8aa0b3; font-size:11px; line-height:1.1; }
+  .pin .badge { margin-top:2px; display:inline-block; font-size:10px; padding:2px 5px; line-height:1.1; }
   .pin.defX::after{
     content:"✕";
-    position:absolute;
-    inset:-4px;
-    display:grid;
-    place-items:center;
-    font-size:34px;
-    color:rgba(255,93,93,.9);
-    text-shadow:0 0 10px rgba(255,93,93,.45);
+    position:absolute; inset:-4px; display:grid; place-items:center;
+    font-size:28px; color:rgba(255,93,93,.9); text-shadow:0 0 10px rgba(255,93,93,.45);
   }
   .pin.faded{ opacity:.35; filter:grayscale(.25); }
 
-  /* 📱 Responsive scaling for small screens */
-  @media (max-width: 600px) {
-    .pin { min-width:38px; padding:3px 4px; font-size:10px; }
-    .pin .id { font-size:10px; }
-    .pin .badge { font-size:9px; padding:2px 4px; }
-    .pin .zone { font-size:9px; }
+  /* 📱 Extra small scaling for phones */
+  @media (max-width:600px){
+    .pin { min-width:30px; padding:1.5px 3px; font-size:8.5px; border-radius:8px; }
+    .pin .id { font-size:8.5px; }
+    .pin .zone { font-size:7.5px; display:none; } /* hide zone on phones */
+    .pin .badge { font-size:7.5px; padding:1px 3px; }
   }
 
   /* Developer grid overlay */
