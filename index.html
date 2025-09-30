@@ -137,6 +137,12 @@
 
     .row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hint {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  color: #b0bec5;
+  text-align: left;
+}
   </style>
 </head>
 <body>
@@ -155,6 +161,7 @@
         </select>
 
         <input id="pass" type="text" placeholder="Enter Password" inputmode="text" autocomplete="off" />
+        <p class="hint">Password หรือ คำตอบเป็นตัวเลข หรือ ภาษาอังกฤษตัวพิมพ์ใหญ่เท่านั้น</p>
 
         <button id="btn" type="button" aria-label="Defuse">Defuse</button>
       </div>
@@ -249,6 +256,7 @@
 </script>
 </body>
 </html>
+
 
 
 
