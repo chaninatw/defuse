@@ -61,18 +61,22 @@
     inset:0;
     pointer-events:none;
   }
-  .pin{
+
+  /* 📍 Pin Styling */
+  .pin {
     position:absolute;
     transform:translate(-50%,-50%);
     min-width:46px;
     background:#0e151d;
     border:1px solid var(--outline);
     border-radius:12px;
-    padding:6px 8px;
+    padding:4px 6px;
     text-align:center;
+    font-size:13px;
   }
-  .pin .id{ font-weight:800; }
-  .pin .badge{ margin-top:4px; display:inline-block; }
+  .pin .id { font-weight:800; font-size:13px; }
+  .pin .badge { margin-top:3px; display:inline-block; font-size:11px; }
+  .pin .zone { color:#8aa0b3; font-size:12px; }
   .pin.defX::after{
     content:"✕";
     position:absolute;
@@ -84,6 +88,14 @@
     text-shadow:0 0 10px rgba(255,93,93,.45);
   }
   .pin.faded{ opacity:.35; filter:grayscale(.25); }
+
+  /* 📱 Responsive scaling for small screens */
+  @media (max-width: 600px) {
+    .pin { min-width:38px; padding:3px 4px; font-size:10px; }
+    .pin .id { font-size:10px; }
+    .pin .badge { font-size:9px; padding:2px 4px; }
+    .pin .zone { font-size:9px; }
+  }
 
   /* Developer grid overlay */
   #gridOverlay{
@@ -214,7 +226,7 @@ function pinHTML(b){
   const extra = defused ? ' defX faded' : '';
   return `<div class="pin${extra}" style="left:${left}%; top:${top}%;">
     <div class="id">${b.id}</div>
-    <div class="zone" style="color:#8aa0b3;font-size:12px;">${b.zone || ''}</div>
+    <div class="zone">${b.zone || ''}</div>
     <div>${badge(defused?'Defused':(b.status||'Active'))}</div>
   </div>`;
 }
