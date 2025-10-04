@@ -130,6 +130,27 @@
     button:active{ transform: translateY(1px) scale(.995); }
     button[disabled]{ opacity:.55; cursor:not-allowed; filter:grayscale(.2); }
 
+    a{
+      height: var(--field-h);
+      width: fit-content;
+      padding: 0 18px;
+      border:0;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #3198e7, #1365c9);
+      color:#051013;
+      font-weight:800;
+      font-size:16px;
+      letter-spacing:.3px;
+      cursor:pointer;
+      box-shadow: 0 8px 22px rgba(36,216,138,.25), 0 0 0 1px rgba(0,0,0,.25) inset;
+      transition: transform .06s ease, filter .15s ease;
+      text-align: center;
+      align-content: center;
+      text-decoration: none;
+    }
+    a:hover{ filter: brightness(1.08); }
+    a:active{ transform: translateY(1px) scale(.995); }
+
     .msg{ margin-top:10px; font-size:14px; color:var(--muted); }
     .msg.ok{ color: var(--accent); text-shadow: 0 0 12px rgba(36,216,138,.35); }
     .msg.err{ color: var(--danger); }
@@ -163,7 +184,10 @@
         <input id="pass" type="text" placeholder="Enter Password" inputmode="text" autocomplete="off" />
         <p class="hint">ใส่ Password หรือ คำตอบเป็นตัวเลข หรือ ภาษาอังกฤษตัวพิมพ์ใหญ่เท่านั้น</p>
 
-        <button id="btn" type="button" aria-label="Defuse">Defuse</button>
+        <div style="display: flex;">
+          <button id="btn" type="button" aria-label="Defuse">Defuse</button>
+          <a id="openProblemUrl" target="_blank" rel="noopener noreferrer" style="margin-left: 0.5rem;">Solve</a>
+        </div>
       </div>
 
       <div id="msg" class="msg">Loading…</div>
@@ -172,7 +196,7 @@
 
 <script>
   /* ====== CONFIG: paste your Apps Script /exec ====== */
-  const API_BASE = 'https://script.google.com/macros/s/AKfycbyIMQhvL2-3aXGVBlF6Br-7KgErcnQZus1eO07KdpbP48ainM5S3Z4dPSY-iVkYCW_o/exec';
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbx9ENHOVLrkPJ_vdWsx01Wfu4AhvazkAZBz3IXZjTgojyukYu6xoWONX7edX1BQmc0S/exec';
   /* ================================================== */
 
   // JSONP helper (bypasses CORS)
@@ -194,11 +218,12 @@
   const qs = new URLSearchParams(location.search);
   const bombId = (qs.get('id') || '').trim();
 
-  const idEl = document.getElementById('bombId');
-  const msg  = document.getElementById('msg');
-  const btn  = document.getElementById('btn');
-  const pass = document.getElementById('pass');
-  const grp  = document.getElementById('group');
+  const idEl        = document.getElementById('bombId');
+  const msg         = document.getElementById('msg');
+  const problemUrl  = document.getElementById('openProblemUrl');
+  const btn         = document.getElementById('btn');
+  const pass        = document.getElementById('pass');
+  const grp         = document.getElementById('group');
 
   idEl.textContent = bombId || '—';
 
@@ -212,6 +237,9 @@
     grp.disabled = on;
     btn.disabled = on;
   }
+  function setProblemUrl(url){
+    problemUrl.href = url;
+  }
 
   async function load() {
     if (!bombId) { setMsg('⚠️ Missing bomb ID in URL.', 'msg err'); setLockedUI(true); return; }
@@ -221,6 +249,7 @@
       if (!data.ok) { setMsg('⚠️ ' + (data.message || 'Error'), 'msg err'); return; }
       if (!data.found) { setMsg('❓ Bomb not found.', 'msg err'); setLockedUI(true); return; }
       if (data.locked) { setLockedUI(true); setMsg('🔒 Already defused by Group ' + (data.group || '—') + '.', 'msg warn'); return; }
+      setProblemUrl(data.problemUrl);
       setLockedUI(false); setMsg('Ready.');
     }catch(e){
       setMsg('⚠️ Network error: ' + e.message, 'msg err');
