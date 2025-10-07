@@ -26,7 +26,8 @@ const el = {
     statusSel: document.getElementById('statusSel'),
     search: document.getElementById('searchBox'),
     status: document.getElementById('status'),
-    refresh: document.getElementById('refreshBtn')
+    refresh: document.getElementById('refreshBtn'),
+    statsContainer: document.getElementById('statsContainer'),
 };
 
 let data = { items: [] };
@@ -55,7 +56,12 @@ function tileHTML(b) {
 
 function uniqueZones(items) {
     const z = Array.from(new Set(items.map(i => (i.zone || '').toString().trim()).filter(Boolean))).sort();
-    el.zoneSel.innerHTML = '<option value="">All zones</option>' + z.map(v => `<option>${v}</option>`).join('');
+    const counts = computeStatsByZone(items);
+    console.log(counts);
+    el.statsContainer.innerHTML = z.map(v => `<div class="zone-stats-container">
+        <p style="font-size: 16px; font-weight: 800;">${v}</p>
+
+    </div>`).join('');
 }
 function applyFilters(items) {
     const z = el.zoneSel?.value.trim();
@@ -76,13 +82,25 @@ function groupKey(v) {
     return (/^[1-8]$/).test(s) ? s : '-';
 }
 function computeDefusedByGroup(items) {
-    const defused = items.filter(b => b.locked || b.status === 'Defused');
+    const validItems = items.filter(b => b.status !== "");
+    const defused = validItems.filter(b => b.locked || b.status === 'Defused');
     const counts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0 };
     defused.forEach(b => {
         const g = groupKey(b.group);
         if (counts[g] != null) counts[g] += 1;
     });
-    return { counts, total: defused.length, remaining: items.length - defused.length };
+    return { counts, total: defused.length, remaining: validItems.length - defused.length };
+}
+function computeStatsByZone(items) {
+    let counts = {};
+    items.forEach(b => {
+        if (b.status === '') return;
+        const g = b.zone;
+        const d = (b.status === 'Defused') ? 1 : 0;
+        if (counts[g] != null) counts[g][b.status] += 1;
+        else counts = { ...counts, [g]: { Active: 1 - d, Defused: d } }
+    });
+    return counts;
 }
 function renderScoreboard(allItems) {
     const elSB = document.getElementById('scoreboard');
@@ -127,14 +145,8 @@ function createGridLabels() {
 /* ===== Render ===== */
 function render() {
     const items = applyFilters(data.items);
-    const counts = {
-        total: data.items.length,
-        active: data.items.filter(b => !(b.locked) && (b.status !== 'Defused')).length,
-        defused: data.items.filter(b => b.locked || b.status === 'Defused').length
-    };
-    el.status.textContent = `Showing ${items.length}/${counts.total} • Active ${counts.active} • Defused ${counts.defused}`;
-
-    renderScoreboard(data.items);
+    uniqueZones(items);
+    renderScoreboard(items);
     renderRefreshedTime();
 
     if (FLOORPLAN_URL && el.floorImg) el.floorImg.src = FLOORPLAN_URL;
@@ -154,4 +166,4 @@ async function load() {
 }
 
 load();
-setInterval(load, AUTO_REFRESH_MS);
+// setInterval(load, AUTO_REFRESH_MS);

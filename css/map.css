@@ -92,21 +92,36 @@ input {
 /* Floorplan layout */
 .map-shell {
   padding: 0;
+  display: flex;
+  gap: 12px;
 }
 
 .map-container {
   position: relative;
-  width: 100%;
+  width: 70%;
   max-width: 1200px;
-  margin: 12px auto 0;
   overflow: hidden;
   border-radius: 12px;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 }
 
-.map-container img {
-  width: 100%;
-  height: auto;
-  display: block;
+.stats-container {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 30%;
+  border-radius: 12px;
+
+  .zone-stats-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+  }
 }
 
 #pinsLayer {
@@ -164,6 +179,10 @@ input {
   filter: grayscale(0.25);
 }
 
+.description {
+  font-size: medium;
+}
+
 /* 📱 Extra small scaling for phones */
 @media (max-width: 600px) {
   .pin {
@@ -186,6 +205,23 @@ input {
   .pin .badge {
     font-size: 7.5px;
     padding: 1px 3px;
+  }
+
+  .description {
+    font-size: small;
+  }
+
+  .map-shell {
+    flex-direction: column;
+  }
+
+  .map-container {
+    width: 100%;
+  }
+
+  .stats-container {
+    width: 100%;
+    flex-direction: row;
   }
 }
 

@@ -13,19 +13,16 @@
     <header>
       <h1>Bomb Map</h1>
       <div class="controls">
-        <p id="lastRefresh">Last updated: -</p>
+        <p id="lastRefresh" class="description">Last updated: -</p>
       </div>
     </header>
 
     <!-- Map container -->
-    <div id="container" class="panel map-shell">
-      <div class="map-container">
+    <div id="container" class="map-shell">
+      <div class="panel map-container">
         <img id="floorImage" src="KVIS_map.png?v=2" alt="Floorplan">
-
-        <!-- grid + pins -->
-        <div id="gridOverlay"></div>
-        <div id="pinsLayer"></div>
       </div>
+      <div id="statsContainer" class="panel stats-container"></div>
     </div>
 
     <!-- Scoreboard -->
