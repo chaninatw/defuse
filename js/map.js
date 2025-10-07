@@ -118,7 +118,6 @@ function createGridLabels() {
         ly.style.left = `2%`; ly.style.top = `${i}%`; grid.appendChild(ly);
     }
 }
-createGridLabels();
 
 /* ===== Render ===== */
 function render() {
@@ -132,13 +131,8 @@ function render() {
 
     renderScoreboard(data.items);
 
-    if (FLOORPLAN_URL) {
-        if (el.floorImg) el.floorImg.src = FLOORPLAN_URL;
-        if (el.pins) el.pins.innerHTML = items.map(pinHTML).join('');
-    } else {
-        el.container.className = 'panel grid';
-        el.container.innerHTML = items.map(tileHTML).join('');
-    }
+    if (FLOORPLAN_URL && el.floorImg) el.floorImg.src = FLOORPLAN_URL;
+    else el.container.className = 'panel grid';
 }
 
 /* ===== Load ===== */
