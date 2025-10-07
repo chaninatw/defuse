@@ -51,8 +51,10 @@ async function load() {
         const data = await jsonp('get', { id: bombId });
         if (!data.ok) { setMsg('⚠️ ' + (data.message || 'Error'), 'msg err'); return; }
         if (!data.found) { setMsg('❓ Bomb not found.', 'msg err'); setLockedUI(true); return; }
-        if (data.locked) { setLockedUI(true); setMsg('🔒 Already defused by Group ' + (data.group || '—') + '.', 'msg warn'); return; }
+
+        // If bomb is valid, activate the puzzle button regardless
         setProblemUrl(data.problemUrl);
+        if (data.locked) { setLockedUI(true); setMsg('🔒 Already defused by Group ' + (data.group || '—') + '.', 'msg warn'); return; }
         setLockedUI(false); setMsg('Ready.');
     } catch (e) {
         setMsg('⚠️ Network error: ' + e.message, 'msg err');
