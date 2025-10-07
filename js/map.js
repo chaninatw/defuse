@@ -103,6 +103,11 @@ function renderScoreboard(allItems) {
     <div class="sb-grid">${rows.join('')}</div>
   `;
 }
+function renderRefreshedTime() {
+    const now = new Date();
+    const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    document.getElementById('lastRefresh').innerHTML = 'Last updated: ' + now.toLocaleDateString('en-US', options);
+}
 
 /* ===== Grid labels ===== */
 function createGridLabels() {
@@ -130,6 +135,7 @@ function render() {
     el.status.textContent = `Showing ${items.length}/${counts.total} • Active ${counts.active} • Defused ${counts.defused}`;
 
     renderScoreboard(data.items);
+    renderRefreshedTime();
 
     if (FLOORPLAN_URL && el.floorImg) el.floorImg.src = FLOORPLAN_URL;
     else el.container.className = 'panel grid';
@@ -146,8 +152,6 @@ async function load() {
         el.status.textContent = '⚠️ ' + e.message;
     }
 }
-
-el.refresh.onclick = (e) => { e.preventDefault(); load(); };
 
 load();
 setInterval(load, AUTO_REFRESH_MS);
