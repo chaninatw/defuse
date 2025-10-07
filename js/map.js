@@ -58,9 +58,9 @@ function uniqueZones(items) {
     el.zoneSel.innerHTML = '<option value="">All zones</option>' + z.map(v => `<option>${v}</option>`).join('');
 }
 function applyFilters(items) {
-    const z = el.zoneSel.value.trim();
-    const s = el.statusSel.value.trim();
-    const q = el.search.value.trim().toLowerCase();
+    const z = el.zoneSel?.value.trim();
+    const s = el.statusSel?.value.trim();
+    const q = el.search?.value.trim().toLowerCase();
     return items.filter(b => {
         if (z && String(b.zone || '') !== z) return false;
         const st = (b.locked || b.status === 'Defused') ? 'Defused' : (b.status || 'Active');
@@ -141,18 +141,12 @@ async function load() {
         const res = await jsonp('list', {});
         if (!res || !res.ok) throw new Error(res && res.message || 'Load error');
         data = res;
-        uniqueZones(res.items);
         render();
     } catch (e) {
         el.status.textContent = '⚠️ ' + e.message;
     }
 }
 
-['change', 'input'].forEach(ev => {
-    el.zoneSel.addEventListener(ev, render);
-    el.statusSel.addEventListener(ev, render);
-    el.search.addEventListener(ev, render);
-});
 el.refresh.onclick = (e) => { e.preventDefault(); load(); };
 
 load();
