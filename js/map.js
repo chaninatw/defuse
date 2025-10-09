@@ -57,10 +57,18 @@ function tileHTML(b) {
 function uniqueZones(items) {
     const z = Array.from(new Set(items.map(i => (i.zone || '').toString().trim()).filter(Boolean))).sort();
     const counts = computeStatsByZone(items);
-    console.log(counts);
     el.statsContainer.innerHTML = z.map(v => `<div class="zone-stats-container">
         <p style="font-size: 16px; font-weight: 800;">${v}</p>
-
+        <div class="zone-stats">
+            <div class="panel common red">
+                <p>Active</p>
+                <p style="font-size: 24px;">${counts[v].Active}</p>
+            </div>
+            <div class="panel common green">
+                <p">Defused</p>
+                <p style="font-size: 24px;">${counts[v].Defused}</p>
+            </div>
+        </div>
     </div>`).join('');
 }
 function applyFilters(items) {
