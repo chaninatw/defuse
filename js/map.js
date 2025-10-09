@@ -174,4 +174,4 @@ async function load() {
 }
 
 load();
-// setInterval(load, AUTO_REFRESH_MS);
+setInterval(load, AUTO_REFRESH_MS);
