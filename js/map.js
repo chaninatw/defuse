@@ -1,6 +1,6 @@
 /* ===== CONFIG ===== */
 const API_BASE = 'https://script.google.com/macros/s/AKfycbyIMQhvL2-3aXGVBlF6Br-7KgErcnQZus1eO07KdpbP48ainM5S3Z4dPSY-iVkYCW_o/exec';
-const FLOORPLAN_URL = 'KVIS_map.png?v=2';
+const FLOORPLAN_URL = 'SSMap.png?v=1';
 const AUTO_REFRESH_MS = 5000;
 /* ================== */
 
