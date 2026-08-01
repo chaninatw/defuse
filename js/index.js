@@ -1,5 +1,5 @@
 /* ====== CONFIG: paste your Apps Script /exec ====== */
-const API_BASE = 'https://script.google.com/macros/s/AKfycbx9ENHOVLrkPJ_vdWsx01Wfu4AhvazkAZBz3IXZjTgojyukYu6xoWONX7edX1BQmc0S/exec';
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwCgAj7ZEEiz0sS_lzlcp3_5HFEglkttR7dXdzITeyAwqK1xjHU_AJhHJEUbfs9jPAO/exec';
 /* ================================================== */
 
 // JSONP helper (bypasses CORS)
