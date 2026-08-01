@@ -1,5 +1,5 @@
 /* ===== CONFIG ===== */
-const API_BASE = 'https://script.google.com/macros/s/AKfycbwCgAj7ZEEiz0sS_lzlcp3_5HFEglkttR7dXdzITeyAwqK1xjHU_AJhHJEUbfs9jPAO/exec';
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwaxt6mz8NZtNSqTv9nFgr__dOFJ4HowEk3Im5UhzWH9MOKgAVz1Ms3RAR73vNfPDPx/exec';
 const AUTO_REFRESH_MS = 5000;
 /* ================== */
 
