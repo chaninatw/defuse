@@ -26,7 +26,6 @@ const msg = document.getElementById('msg');
 const problemUrl = document.getElementById('openProblemUrl');
 const btn = document.getElementById('btn');
 const pass = document.getElementById('pass');
-const grp = document.getElementById('group');
 
 idEl.textContent = bombId || '—';
 
@@ -37,7 +36,6 @@ function setMsg(text, cls = 'msg') {
 }
 function setLockedUI(on) {
     pass.disabled = on;
-    grp.disabled = on;
     btn.disabled = on;
 }
 function setProblemUrl(url) {
@@ -54,7 +52,7 @@ async function load() {
 
         // If bomb is valid, activate the puzzle button regardless
         setProblemUrl(data.problemUrl);
-        if (data.locked) { setLockedUI(true); setMsg('🔒 Already defused by Group ' + (data.group || '—') + '.', 'msg warn'); return; }
+        if (data.locked) { setLockedUI(true); setMsg('🔒 Already defused.', 'msg warn'); return; }
         setLockedUI(false); setMsg('Ready.');
     } catch (e) {
         setMsg('⚠️ Network error: ' + e.message, 'msg err');
@@ -62,16 +60,14 @@ async function load() {
 }
 
 async function defuse() {
-    const g = (grp.value || '').trim();
     const v = (pass.value || '').trim();
-    if (!g) { setMsg('⚠️ Please select a group (1–8).', 'msg err'); return; }
     if (!v) { setMsg('⚠️ Please enter a password.', 'msg err'); return; }
 
     setMsg('Checking…', 'msg');
     btn.disabled = true;
 
     try {
-        const res = await jsonp('check', { id: bombId, password: v, group: g });
+        const res = await jsonp('check', { id: bombId, password: v });
         setMsg(res.message || (res.ok ? 'OK' : 'Error'), res.ok ? 'msg ok' : 'msg err');
         if (res.locked) setLockedUI(true);
         else btn.disabled = false;

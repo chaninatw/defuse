@@ -89,249 +89,123 @@ input {
   background: var(--red);
 }
 
-/* Floorplan layout */
-.map-shell {
-  padding: 0;
-  display: flex;
-  gap: 12px;
-}
-
-.map-container {
-  position: relative;
-  width: 70%;
-  max-width: 1200px;
-  overflow: hidden;
-  border-radius: 12px;
-
-  img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-}
-
-.stats-container {
-  display: flex;
-  flex-direction: column-reverse;
-  width: 30%;
-  border-radius: 12px;
-
-  .zone-stats-container {
-    display: flex;
-    height: 100%;
-    padding: 8px;
-    flex-direction: column;
-
-    .zone-stats {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      max-width: 100%;
-      column-gap: 8px;
-      flex-grow: 1;
-    }
-
-    .common {
-      display: flex;
-      flex: 1 1 0;
-      flex-direction: column;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 800;
-      align-items: center;
-      justify-content: center;
-
-      p {
-        margin: 0;
-        padding-top: 2px;
-        padding-bottom: 2px;
-        text-align: center;
-      }
-    }
-
-    .green {
-      border: 1px solid #50e2a8;
-      color: #a9f3d2;
-      background: rgba(36, 216, 138, 0.1);
-    }
-
-    .red {
-      border: 1px solid #e25050;
-      color: #f3a9a9;
-      background: rgba(216, 36, 36, 0.1);
-    }
-  }
-}
-
-#pinsLayer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-/* 📍 Pin Styling */
-.pin {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  min-width: 46px;
-  background: #0e151d;
-  border: 1px solid var(--outline);
-  border-radius: 10px;
-  padding: 4px 5px;
-  text-align: center;
-  font-size: 12px;
-}
-
-.pin .id {
-  font-weight: 800;
-  font-size: 12px;
-  line-height: 1.1;
-}
-
-.pin .zone {
-  color: #8aa0b3;
-  font-size: 11px;
-  line-height: 1.1;
-}
-
-.pin .badge {
-  margin-top: 2px;
-  display: inline-block;
-  font-size: 10px;
-  padding: 2px 5px;
-  line-height: 1.1;
-}
-
-.pin.defX::after {
-  content: "✕";
-  position: absolute;
-  inset: -4px;
-  display: grid;
-  place-items: center;
-  font-size: 28px;
-  color: rgba(255, 93, 93, 0.9);
-  text-shadow: 0 0 10px rgba(255, 93, 93, 0.45);
-}
-
-.pin.faded {
-  opacity: 0.35;
-  filter: grayscale(0.25);
-}
-
 .description {
   font-size: medium;
 }
 
+/* Countdown timer */
+.timer-container {
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.timer-display {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(36px, 8vw, 56px);
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-shadow: 0 0 18px rgba(42, 146, 255, 0.25);
+}
+
+.timer-display.timer-warn {
+  color: var(--red);
+  text-shadow: 0 0 18px rgba(255, 93, 93, 0.45);
+}
+
+.timer-display.timer-up {
+  color: var(--red);
+  animation: pulseTimer 1s infinite;
+}
+
+@keyframes pulseTimer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.timer-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-controls button {
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  background: linear-gradient(180deg, #2fdc97, #12a86b);
+  color: #051013;
+}
+
+.timer-controls button.secondary {
+  background: #1b2430;
+  color: #bcd4f0;
+  border: 1px solid var(--outline);
+}
+
+.timer-controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Bomb status totals */
+.stats-container {
+  padding: 20px;
+}
+
+.totals {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.common {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  padding: 16px 8px;
+  border-radius: 12px;
+  font-weight: 800;
+  align-items: center;
+  justify-content: center;
+}
+
+.common p {
+  margin: 0;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  text-align: center;
+}
+
+.green {
+  border: 1px solid #50e2a8;
+  color: #a9f3d2;
+  background: rgba(36, 216, 138, 0.1);
+}
+
+.red {
+  border: 1px solid #e25050;
+  color: #f3a9a9;
+  background: rgba(216, 36, 36, 0.1);
+}
+
 /* 📱 Extra small scaling for phones */
 @media (max-width: 600px) {
-  .pin {
-    min-width: 30px;
-    padding: 1.5px 3px;
-    font-size: 8.5px;
-    border-radius: 8px;
-  }
-
-  .pin .id {
-    font-size: 8.5px;
-  }
-
-  .pin .zone {
-    font-size: 7.5px;
-    display: none;
-  }
-
-  /* hide zone on phones */
-  .pin .badge {
-    font-size: 7.5px;
-    padding: 1px 3px;
-  }
-
   .description {
     font-size: small;
   }
 
-  .map-shell {
+  .totals {
     flex-direction: column;
   }
-
-  .map-container {
-    width: 100%;
-  }
-
-  .zone-stats-container {
-    width: 100%;
-  }
-
-  .stats-container {
-    width: 100%;
-    flex-direction: row;
-  }
-}
-
-/* Developer grid overlay */
-#gridOverlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.06) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 10% 10%;
-}
-
-.grid-label {
-  position: absolute;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  transform: translate(-50%, -50%);
-  user-select: none;
-}
-
-/* Scoreboard */
-.scoreboard {
-  padding: 12px;
-  margin-top: 12px;
-}
-
-.sb-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.sb-grid {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-}
-
-.sb-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid var(--outline);
-  border-radius: 10px;
-  padding: 8px 10px;
-  background: #0e151d;
-}
-
-.sb-item .g {
-  font-weight: 700;
-}
-
-.sb-item .c {
-  font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid #50e2a8;
-  color: #a9f3d2;
-  background: rgba(36, 216, 138, 0.1);
 }
 
 .status {

@@ -4,29 +4,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Bomb Map</title>
+  <title>Bomb Status</title>
   <link rel="stylesheet" href="./css/map.css">
 </head>
 
 <body>
   <div class="wrap">
     <header>
-      <h1>Bomb Map</h1>
+      <h1>Bomb Status</h1>
       <div class="controls">
         <p id="lastRefresh" class="description">Last updated: -</p>
       </div>
     </header>
 
-    <!-- Map container -->
-    <div id="container" class="map-shell">
-      <div class="panel map-container">
-        <img id="floorImage" src="SSMap.png?v=2" alt="Floorplan">
+    <!-- Countdown timer -->
+    <div class="panel timer-container">
+      <div id="timerDisplay" class="timer-display">15:00</div>
+      <div class="timer-controls">
+        <button id="timerStartBtn" type="button">Start</button>
+        <button id="timerResetBtn" type="button" class="secondary">Reset</button>
       </div>
-      <div id="statsContainer" class="panel stats-container"></div>
     </div>
 
-    <!-- Scoreboard -->
-    <div id="scoreboard" class="panel scoreboard"></div>
+    <!-- Bomb status summary -->
+    <div id="statsContainer" class="panel stats-container"></div>
 
     <div id="status" class="status"></div>
   </div>
